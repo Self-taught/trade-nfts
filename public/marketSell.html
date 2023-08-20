@@ -196,10 +196,13 @@
           "ssc-mainnet-hive",
           "Active",
           JSON.stringify(payload),
-          `Sell ${numberOfNfts} ${nftName}`
-          // (response) => {
-          //   console.log(response);
-          // }
+          `Sell ${numberOfNfts} ${nftName}`,
+          (response) => {
+            if (response.success === true) {
+              submitButton.disabled = true;
+              submitButton.textContent = "Transaction Done! Success!";
+            }
+          }
         );
       }
     </script>

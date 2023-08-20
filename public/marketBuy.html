@@ -143,6 +143,7 @@
           .getElementById("validationCustom06")
           .textContent.split(",");
         const totalValue = document.getElementById("validationCustom07").value;
+        const submitButton = document.getElementById("submitButton");
 
         // Perform actions with the form values
         // console.log("Project Name:", projectName);
@@ -177,9 +178,12 @@
           "Active",
           JSON.stringify(payload),
           `Buy ${numberOfNfts} ${nftName}`,
-          // (response) => {
-          //   console.log(response);
-          // }
+          (response) => {
+            if (response.success === true) {
+              submitButton.disabled = true;
+              submitButton.textContent = 'Transaction Done! Success!';
+            }
+          }
         );
       }
     </script>

@@ -99,7 +99,7 @@
             <p>Id's of all the nft's you want to change price.</p>
             <div id="validationCustom06">{nftIds}</div>
           </div>
-          
+
           <div class="col-12">
             <button class="btn btn-info" type="submit" id="submitButton">
               Change Price
@@ -167,10 +167,13 @@
           "ssc-mainnet-hive",
           "Active",
           JSON.stringify(payload),
-          `Change Price of ${numberOfNfts} ${nftName} to ${price}`
-          // (response) => {
-          //   console.log(response);
-          // }
+          `Change Price of ${numberOfNfts} ${nftName} to ${price}`,
+          (response) => {
+            if (response.success === true) {
+              submitButton.disabled = true;
+              submitButton.textContent = "Transaction Done! Success!";
+            }
+          }
         );
       }
     </script>

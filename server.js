@@ -7,24 +7,7 @@ const axios = require("axios");
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use((req, res, next) => {
-  // Specify the routes you want to exclude from this middleware
-  const excludedRoutes = [
-    "/buy/:projectName/:userName/:numberOfNfts/:nftName/:nftPrice/:priceSymbol",
-    "/sell/:projectName/:userName/:numberOfNfts/:nftName/:nftPrice/:priceSymbol",
-    "/changePrice/:projectName/:userName/:numberOfNfts/:nftName/:nftPriceOld/:nftPrice/:priceSymbol",
-    "/transfer/:projectName/:userName/:hiveAccount/:numberOfNfts/:nftName",
-  ]; // Add the routes you want to exclude
-
-  if (!excludedRoutes.includes(req.path)) {
-    // Handle your desired response for non-excluded routes
-    res.send("Please Retry Again");
-  } else {
-    // Pass the request to the next middleware or route handler
-    next();
-  }
-});
-
+// BUY request nfts
 app.get(
   "/buy/:projectName/:userName/:numberOfNfts/:nftName/:nftPrice/:priceSymbol",
   async (req, res) => {
@@ -126,6 +109,7 @@ app.get(
   }
 );
 
+// Sell request nfts
 app.get(
   "/sell/:projectName/:userName/:numberOfNfts/:nftName/:nftPrice/:priceSymbol",
   async (req, res) => {
@@ -220,6 +204,7 @@ app.get(
   }
 );
 
+// Change request nfts
 app.get(
   "/changePrice/:projectName/:userName/:numberOfNfts/:nftName/:nftPriceOld/:nftPrice/:priceSymbol",
   async (req, res) => {
@@ -239,7 +224,13 @@ app.get(
       replacedNftName = replacedNftName.replaceAll("-", " ");
     }
 
-    const checkPrice = parseFloat(nftPriceOld).toFixed(3);
+    let checkPrice = parseFloat(nftPriceOld);
+
+    if (priceSymbol === "SWAP.HIVE") {
+      checkPrice = checkPrice.toFixed(8);
+    } else if (priceSymbol === "SIM") {
+      checkPrice = checkPrice.toFixed(3);
+    }
 
     const marketData = async (userName, offset) => {
       const q = {
@@ -324,6 +315,111 @@ app.get(
   }
 );
 
+// Remove Cards from market
+// Change request nfts
+app.get(
+  "/cancel/:projectName/:userName/:numberOfNfts/:nftName/:nftPrice/:priceSymbol",
+  async (req, res) => {
+    const {
+      projectName,
+      userName,
+      nftName,
+      numberOfNfts,
+      nftPrice,
+      priceSymbol,
+    } = req.params;
+
+    let replacedNftName = nftName;
+
+    if (nftName.includes("-")) {
+      replacedNftName = replacedNftName.replaceAll("-", " ");
+    }
+
+    let checkPrice = parseFloat(nftPrice);
+
+    if (priceSymbol === "SWAP.HIVE") {
+      checkPrice = checkPrice.toFixed(8);
+    } else if (priceSymbol === "SIM") {
+      checkPrice = checkPrice.toFixed(3);
+    }
+
+    const marketData = async (userName, offset) => {
+      const q = {
+        account: userName,
+        "grouping.name": replacedNftName,
+        price: checkPrice,
+        priceSymbol: priceSymbol,
+      };
+      const url = "https://herpc.dtools.dev/contracts";
+      // const url = 'https://engine.rishipanthee.com/contracts';
+      const params = {
+        contract: "nftmarket",
+        table: "CITYsellBook",
+        query: q,
+        limit: 50,
+        offset: offset,
+        indexes: [],
+      };
+      const j = {
+        jsonrpc: "2.0",
+        id: 1,
+        method: "find",
+        params: params,
+      };
+
+      try {
+        const response = await axios.post(url, j);
+        const data = response.data;
+
+        return data.result;
+      } catch (error) {
+        return []; // Return an empty array or handle the error according to your requirements
+      }
+    };
+
+    const resultData = await marketData(userName, 0);
+
+    if (resultData.length < numberOfNfts) {
+      res.send(
+        `You do not have ${numberOfNfts} ${replacedNftName} sell orders on Market. Try again!`
+      );
+      return;
+    }
+
+    const filteredData = resultData
+      .slice(0, parseInt(numberOfNfts));
+
+    const nftIdData = filteredData.map((element) => element.nftId);
+
+    // res.status(200).json({
+    //   payload,
+    // });
+
+    fs.readFile(
+      path.join(__dirname, "public", "cancelCards.html"),
+      "utf8",
+      (err, data) => {
+        if (err) {
+          console.error("Error reading HTML file:", err);
+          res.status(500).send("Error reading HTML file");
+        } else {
+          const modifiedHTML = data
+            .replace("{projectName}", projectName)
+            .replace("{userName}", userName)
+            .replace("{nftName}", replacedNftName)
+            .replace("{numberOfNfts}", numberOfNfts)
+            .replace("{nftPrice}", nftPrice)
+            .replace("{priceSymbol}", priceSymbol)
+            .replace("{nftIds}", nftIdData);
+
+          res.send(modifiedHTML);
+        }
+      }
+    );
+  }
+);
+
+// Send nfts to a hive_account
 app.get(
   "/transfer/:projectName/:userName/:hiveAccount/:numberOfNfts/:nftName",
   async (req, res) => {
@@ -404,6 +500,10 @@ app.get(
     );
   }
 );
+
+app.use((req, res) => {
+  res.status(404).send("Page not found");
+});
 
 const PORT = 8000;
 app.listen(PORT, () => {

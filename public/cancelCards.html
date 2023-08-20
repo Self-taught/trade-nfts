@@ -26,7 +26,7 @@
             <div class="valid-feedback">Looks good!</div>
           </div>
           <div class="col-md-4">
-            <label for="validationCustom02" class="form-label">Card Name</label>
+            <label for="validationCustom02" class="form-label">NFT Name</label>
             <input
               type="text"
               class="form-control"
@@ -57,7 +57,7 @@
           </div>
           <div class="col-md-4">
             <label for="validationCustom03" class="form-label"
-              >Number of Cards you are selling.</label
+              >Number of Cards you are removing from the market.</label
             >
             <input
               type="number"
@@ -70,33 +70,39 @@
             <div class="invalid-feedback">Please provide a valid count.</div>
           </div>
           <div class="col-md-4">
-            <label for="validationCustom05" class="form-label"
-              >Sending to...
-            </label>
+            <label for="validationCustom05" class="form-label">Symbol</label>
             <input
               type="text"
               class="form-control"
               id="validationCustom05"
-              value="{hive_account}"
+              value="{priceSymbol}"
               readonly
               required
             />
             <div class="invalid-feedback">Please provide a valid symbol.</div>
           </div>
-          <div class="col-md-12 overflow-auto">
-            <p>Id's of all the nft's you want to send.</p>
-            <div id="validationCustom06">{nftIds}</div>
+          <div class="col-md-4">
+            <label for="validationCustom04" class="form-label"
+              >Price they are listed at.</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="validationCustom04"
+              value="{nftPrice}"
+              readonly
+              required
+            />
+            <div class="invalid-feedback">Please provide a valid count.</div>
           </div>
-          <div class="col-12">
-            <strong>
-              Please double check the account name you are sending your nft's
-              to. If you send to wrong account, you might lose your nft's.
-            </strong>
+          <div class="col-md-12 overflow-auto">
+            <p>Id's of all the nft's you want to remove.</p>
+            <div id="validationCustom06">{nftIds}</div>
           </div>
 
           <div class="col-12">
-            <button class="btn btn-success" type="submit" id="submitButton">
-              Send
+            <button class="btn btn-info" type="submit" id="submitButton">
+              Remove Cards
             </button>
           </div>
         </form>
@@ -125,8 +131,8 @@
         ).value;
         const numberOfNfts =
           document.getElementById("validationCustom03").value;
-        const hive_account =
-          document.getElementById("validationCustom05").value;
+        // const priceSymbol = document.getElementById("validationCustom05").value;
+        const price = document.getElementById("validationCustom04").value;
         const nftIds = document
           .getElementById("validationCustom06")
           .textContent.split(",");
@@ -144,16 +150,11 @@
 
         const payload = [
           {
-            contractName: "nft",
-            contractAction: "transfer",
+            contractName: "nftmarket",
+            contractAction: "cancel",
             contractPayload: {
-              to: hive_account,
-              nfts: [
-                {
-                  symbol: projectName,
-                  ids: nftIds,
-                },
-              ],
+              symbol: projectName,
+              nfts: nftIds,
             },
           },
         ];
@@ -165,7 +166,7 @@
           "ssc-mainnet-hive",
           "Active",
           JSON.stringify(payload),
-          `Send ${numberOfNfts} ${nftName} to ${hive_account}`,
+          `Remove ${numberOfNfts} ${nftName} from market`,
           (response) => {
             if (response.success === true) {
               submitButton.disabled = true;
