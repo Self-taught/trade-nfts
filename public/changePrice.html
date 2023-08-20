@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="UTF-8" />
+  <title>Nft Market Bot</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link
+    rel="stylesheet"
+    href="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+  />
+  <body>
+    <div class="">
+      <div class="container-lg mx-auto p-2 my-5">
+        <form class="row g-3 needs-validation" novalidate method="post">
+          <div class="col-md-4">
+            <label for="validationCustom01" class="form-label"
+              >Project Name</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="validationCustom01"
+              value="{projectName}"
+              required
+              readonly
+            />
+            <div class="valid-feedback">Looks good!</div>
+          </div>
+          <div class="col-md-4">
+            <label for="validationCustom02" class="form-label">NFT Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="validationCustom02"
+              value="{nftName}"
+              readonly
+              required
+            />
+            <div class="valid-feedback">Looks good!</div>
+          </div>
+          <div class="col-md-4">
+            <label for="validationCustomUsername" class="form-label"
+              >Username</label
+            >
+            <div class="input-group has-validation">
+              <span class="input-group-text" id="inputGroupPrepend">@</span>
+              <input
+                type="text"
+                class="form-control"
+                id="validationCustomUsername"
+                aria-describedby="inputGroupPrepend"
+                value="{userName}"
+                readonly
+                required
+              />
+              <div class="invalid-feedback">Please choose a username.</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label for="validationCustom03" class="form-label"
+              >Number of Cards you are changing price.</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="validationCustom03"
+              value="{numberOfNfts}"
+              readonly
+              required
+            />
+            <div class="invalid-feedback">Please provide a valid count.</div>
+          </div>
+          <div class="col-md-4">
+            <label for="validationCustom05" class="form-label">Symbol</label>
+            <input
+              type="text"
+              class="form-control"
+              id="validationCustom05"
+              value="{priceSymbol}"
+              readonly
+              required
+            />
+            <div class="invalid-feedback">Please provide a valid symbol.</div>
+          </div>
+          <div class="col-md-4">
+            <label for="validationCustom04" class="form-label"
+              ><strong>New Sale price of each nft</strong></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="validationCustom04"
+              value="{nftPrice}"
+              readonly
+              required
+            />
+            <div class="invalid-feedback">Please provide a valid count.</div>
+          </div>
+          <div class="col-md-12 overflow-auto">
+            <p>Id's of all the nft's you want to change price.</p>
+            <div id="validationCustom06">{nftIds}</div>
+          </div>
+          
+          <div class="col-12">
+            <button class="btn btn-info" type="submit" id="submitButton">
+              Change Price
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Add an event listener to the submit button
+      document
+        .getElementById("submitButton")
+        .addEventListener("click", function (event) {
+          // Prevent the default form submission behavior
+          event.preventDefault();
+
+          // Call your custom JavaScript function here
+          handleFormSubmission();
+        });
+
+      // Define your custom JavaScript function
+      function handleFormSubmission() {
+        // Get values from form fields
+        const projectName = document.getElementById("validationCustom01").value;
+        const nftName = document.getElementById("validationCustom02").value;
+        const userName = document.getElementById(
+          "validationCustomUsername"
+        ).value;
+        const numberOfNfts =
+          document.getElementById("validationCustom03").value;
+        // const priceSymbol = document.getElementById("validationCustom05").value;
+        const price = document.getElementById("validationCustom04").value;
+        const nftIds = document
+          .getElementById("validationCustom06")
+          .textContent.split(",");
+
+        // Perform actions with the form values
+        // console.log("Price:", price);
+        // console.log("NFT Name:", nftName);
+        // console.log("User Name:", userName);
+        // console.log("Number of NFTs:", numberOfNfts);
+        // console.log("Price Symbol:", priceSymbol);
+        // console.log("Nft Ids:", nftIds);
+        // console.log("Total Price:", totalValue);
+
+        // You can add more code here based on your requirements
+
+        const payload = [
+          {
+            contractName: "nftmarket",
+            contractAction: "changePrice",
+            contractPayload: {
+              symbol: projectName,
+              nfts: nftIds,
+              price: price,
+            },
+          },
+        ];
+        // console.log(payload);
+
+        const keychain = window.hive_keychain;
+        keychain.requestCustomJson(
+          userName,
+          "ssc-mainnet-hive",
+          "Active",
+          JSON.stringify(payload),
+          `Change Price of ${numberOfNfts} ${nftName} to ${price}`
+          // (response) => {
+          //   console.log(response);
+          // }
+        );
+      }
+    </script>
+  </body>
+</html>
