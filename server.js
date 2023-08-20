@@ -7,6 +7,24 @@ const axios = require("axios");
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use((req, res, next) => {
+  // Specify the routes you want to exclude from this middleware
+  const excludedRoutes = [
+    "/buy/:projectName/:userName/:numberOfNfts/:nftName/:nftPrice/:priceSymbol",
+    "/sell/:projectName/:userName/:numberOfNfts/:nftName/:nftPrice/:priceSymbol",
+    "/changePrice/:projectName/:userName/:numberOfNfts/:nftName/:nftPriceOld/:nftPrice/:priceSymbol",
+    "/transfer/:projectName/:userName/:hiveAccount/:numberOfNfts/:nftName",
+  ]; // Add the routes you want to exclude
+
+  if (!excludedRoutes.includes(req.path)) {
+    // Handle your desired response for non-excluded routes
+    res.send("Please Retry Again");
+  } else {
+    // Pass the request to the next middleware or route handler
+    next();
+  }
+});
+
 app.get(
   "/buy/:projectName/:userName/:numberOfNfts/:nftName/:nftPrice/:priceSymbol",
   async (req, res) => {
