@@ -32,7 +32,7 @@ app.get(
       // const url = 'https://engine.rishipanthee.com/contracts';
       const params = {
         contract: "nftmarket",
-        table: "CITYsellBook",
+        table: `${projectName}sellBook`,
         query: q,
         limit: 1000,
         offset: offset,
@@ -134,7 +134,7 @@ app.get(
       // const url = 'https://engine.rishipanthee.com/contracts';
       const params = {
         contract: "nft",
-        table: "CITYinstances",
+        table: `${projectName}instances`,
         query: q,
         limit: 50,
         offset: offset,
@@ -158,6 +158,8 @@ app.get(
     };
 
     const resultData = await cardData(userName, 0);
+
+    console.log(resultData.length)
 
     if (resultData.length < numberOfNfts) {
       res.send(`You do not have enough ${replacedNftName} to sell. Try again!`);
@@ -228,7 +230,7 @@ app.get(
 
     if (priceSymbol === "SWAP.HIVE") {
       checkPrice = checkPrice.toFixed(8);
-    } else if (priceSymbol === "SIM") {
+    } else if (priceSymbol === "CROP") {
       checkPrice = checkPrice.toFixed(3);
     }
 
@@ -242,7 +244,7 @@ app.get(
       // const url = 'https://engine.rishipanthee.com/contracts';
       const params = {
         contract: "nftmarket",
-        table: "CITYsellBook",
+        table: `${projectName}sellBook`,
         query: q,
         limit: 50,
         offset: offset,
@@ -339,7 +341,7 @@ app.get(
 
     if (priceSymbol === "SWAP.HIVE") {
       checkPrice = checkPrice.toFixed(8);
-    } else if (priceSymbol === "SIM") {
+    } else if (priceSymbol === "CROP") {
       checkPrice = checkPrice.toFixed(3);
     }
 
@@ -354,7 +356,7 @@ app.get(
       // const url = 'https://engine.rishipanthee.com/contracts';
       const params = {
         contract: "nftmarket",
-        table: "CITYsellBook",
+        table: `${projectName}sellBook`,
         query: q,
         limit: 50,
         offset: offset,
@@ -386,8 +388,7 @@ app.get(
       return;
     }
 
-    const filteredData = resultData
-      .slice(0, parseInt(numberOfNfts));
+    const filteredData = resultData.slice(0, parseInt(numberOfNfts));
 
     const nftIdData = filteredData.map((element) => element.nftId);
 
@@ -438,7 +439,7 @@ app.get(
       // const url = 'https://engine.rishipanthee.com/contracts';
       const params = {
         contract: "nft",
-        table: "CITYinstances",
+        table: `${projectName}instances`,
         query: q,
         limit: 50,
         offset: offset,
